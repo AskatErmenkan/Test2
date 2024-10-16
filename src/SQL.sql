@@ -169,14 +169,44 @@ values (30, 'Winna', 'Ganders', 'wganderst@artisteer.com', 'Female', '2001-11-11
         where c.start_date between 2020-01-01 and 20223-01-01;
 
 -- 5. Выведите имена, дату рождения студентов , которые родились с 198011 по 20041212, и названиегруппы
+    select s.first_name, s.date_of_birth, group_name
+    from Students s
+    join groups g on g.id = s.group_id
+    where s.date_of_birth between '1980-01-01' and '2004-12-12';
 
 --  6. Вывести полное имя, возраст, почту студентов и название группы, где айди группы равен 3
--- 7. Вывести все курсы одной группы, где название группы 'Java-13'
+    select s.first_name, s.last_name, extract(year from age(s.date_of_birth)) as age, s.email, group_name
+    from Students s
+    join groups g on g.id = s.group_id
+    where g.id = 3;
+
+-- 7. Вывести все курсы одной группы, где название группы 'Java 13'
+    select c.course_name, g.group_name
+    from courses c
+    join public.groups g on c.group_id = g.id
+    where g.group_name = 'Java 13';
+
 -- 8. Вывести название всех групп и количество студентов в группе
+    select g.group_name, count(s.id)
+    from groups g
+    join Students s on g.id = s.group_id
+    group by g.group_name;
+
 -- 9.Вывести название всех групп и количество студентов в группе, если в
 -- группе больше 4 студентов.
--- 10. Отсортируйте имена студентов группы по убыванию, где айди группы равна 4 и выведите айдистудента, имя, пол и название группы.
---
+    select g.group_name, count(s.id)
+    from groups g
+    join students s on g.id = s.group_id
+    group by g.group_name
+    having count(s.id) > 4;
+
+-- 10. Отсортируйте имена студентов группы по убыванию, где айди группы равна 4 и выведите айди студента, имя, пол и название группы.
+    select s.id, s.first_name, s.gender, g.group_name
+    from students s
+    join groups g on g.id = s.group_id
+    where group_id > 4
+    order by s.first_name desc;
+
 -- Tasks(Query) Course
 -- 1. Вывести все курсы
     select * from courses;
@@ -192,13 +222,31 @@ values (30, 'Winna', 'Ganders', 'wganderst@artisteer.com', 'Female', '2001-11-11
     where c.id > 4;
 
 -- 4. Вывести имя, почту, специализацию ментора и название курса где курс айди равен 2
-    select mentors.name, mentors.email, mentors.specialization, Lessons.course_id
-
+   select m.first_name, m.email, m.specialization, c.course_name from mentors m
+   join courses c on c.id = m.course_id
+   where c.id = 2;
 
 -- 5. Посчитaть сколько менторов в каждом курсе
--- 6. Сгруппируйте и посчитайте менторов в каждом курсе и выведите только те курсы, где в курсебольше 2 менторов
+    select c.course_name, count(m.id)
+    from courses c
+    join mentors m on c.id = m.course_id
+    group by c.course_name;
+
+-- 6. Сгруппируйте и посчитайте менторов в каждом курсе и выведите только те курсы, где в курсе больше 2 менторов
+    select count(m.id), c.course_name
+    from mentors m
+    join courses c on c.id = m.course_id
+    group by c.course_name
+    having count(m.id) = 1;
+
 -- 7. Вывести название, дату и полное имя ментора, все курсы которые начинаются с 202011 по 202333
+    select course_name, c.start_date, m.first_name, m.last_name
+    from mentors m
+    join courses c on  c.id = m.course_id
+    where c.start_date between '2020-01-01' and '2023-03-03';
+
 -- 8. Вывести имя, почту, возраст студентов курса 'Java 13 core'
+
 -- 9. Вывести тот курс где нет ментора
 -- 10.Вывести тот курс где нет уроков
 -- 11.Вывести тот курс где нет студентов
@@ -208,7 +256,7 @@ values (30, 'Winna', 'Ganders', 'wganderst@artisteer.com', 'Female', '2001-11-11
 
 -- 2. Вывести имя, почту и пол студента, id группы которого равна 2
 -- 3. Вывести группу студента, id  которого равна 4
--- 4. Сгруппируйте студентов по gender и выведите общее количество gender
+-- 4. Сгруппируйте студ ентов по gender и выведите общее количество gender
 -- 5. Найдите студента с id 8 и обновите его данные
 -- 6. Найдите самого старшего студента курса, id курса которого равна 5
 -- 7. Добавьте unique constraint email в столбец таблицы students
@@ -216,9 +264,10 @@ values (30, 'Winna', 'Ganders', 'wganderst@artisteer.com', 'Female', '2001-11-11
 -- 9. Добавьте check constraint gender в столбец таблицы students
 -- Tasks(Query) Mentors
 -- 1. Вывести средний возраст всех менторов
-    select * from mentors
-    where
+    select avg(m.experience)  from mentors m;
+
 -- 2. Вывести имя, почту и специализацию ментора группы 'Java-9'
+
 -- 3. Вывести всех менторов, чей опыт превышает 1 год
 -- 4. Вывести ментора у которого нет курса
 -- 5. Вывести id, имя ментора и его студентов
